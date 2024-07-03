@@ -905,7 +905,7 @@
             // high-entropy client-hints support
             if (_clientHints) {
                 _device[MODEL] = _clientHints['Sec-CH-UA-Model'] || _device[MODEL];
-                _device[TYPE] = _clientHints['Sec-CH-UA-Mobile'] == "1" ? MOBILE : _device[TYPE];
+                _device[TYPE] = _clientHints['Sec-CH-UA-Mobile'] ? MOBILE : _device[TYPE];
             }
 
             return _device;

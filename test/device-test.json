@@ -3860,7 +3860,7 @@
         "desc": "Client hints example",
         "ua": "Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/95.0.0.0 Mobile Safari/537.36",
         "ch": {
-            "Sec-CH-UA-Mobile": "1",
+            "Sec-CH-UA-Mobile": true,
             "Sec-CH-UA-Model": "Pixel 7",
             "Sec-CH-UA-Platform": "Android",
             "Sec-CH-UA-Platform-Version": "13.0.0"
