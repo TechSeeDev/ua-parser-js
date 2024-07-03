@@ -62,8 +62,14 @@ for (var i in methods) {
             if (!!methods[i]['list'][j].ua) {
                 describe('[' + methods[i]['list'][j].desc + ']', function () {
                     describe('"' + methods[i]['list'][j].ua + '"', function () {
+                        var ch = methods[i]['list'][j].ch;
+                        if (ch) {
+                            parser.useHeaderClientHints(ch);
+                        }
                         var expect = methods[i]['list'][j].expect;
                         var result = parser.setUA(methods[i]['list'][j].ua).getResult()[methods[i]['label']];
+
+                        parser.clearClientHints();
 
                         methods[i]['properties'].forEach(function(m) {
                             it('should return ' + methods[i]['label'] + ' ' + m + ': ' + expect[m], function () {
@@ -79,7 +85,7 @@ for (var i in methods) {
 
 describe('Returns', function () {
     it('getResult() should returns JSON', function(done) {
-        assert.deepStrictEqual(new UAParser('').getResult(), 
+        assert.deepStrictEqual(new UAParser('').getResult(),
             {
                 ua : '',
                 browser: { name: undefined, version: undefined, major: undefined },

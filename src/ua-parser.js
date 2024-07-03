@@ -3,7 +3,7 @@
    Copyright © 2012-2021 Faisal Salman <f@faisalman.com>
    MIT License *//*
    Detect Browser, Engine, OS, CPU, and Device type/model from User-Agent data.
-   Supports browser & node.js environment. 
+   Supports browser & node.js environment.
    Demo   : https://faisalman.github.io/ua-parser-js
    Source : https://github.com/faisalman/ua-parser-js */
 /////////////////////////////////////////////////////////////////////////////////
@@ -354,7 +354,7 @@
             /(links) \(([\w\.]+)/i,                                             // Links
             /panasonic;(viera)/i                                                // Panasonic Viera
             ], [NAME, VERSION], [
-            
+
             /(cobalt)\/([\w\.]+)/i                                              // Cobalt
             ], [NAME, [VERSION, /master.|lts./, ""]]
         ],
@@ -537,7 +537,7 @@
             /droid.+; (m[1-5] note) bui/i,
             /\bmz-([-\w]{2,})/i
             ], [MODEL, [VENDOR, 'Meizu'], [TYPE, MOBILE]], [
-                
+
             // Ulefone
             /; ((?:power )?armor(?:[\w ]{0,8}))(?: bui|\))/i
             ], [MODEL, [VENDOR, 'Ulefone'], [TYPE, MOBILE]], [
@@ -825,6 +825,49 @@
         var _uach = (_navigator && _navigator.userAgentData) ? _navigator.userAgentData : undefined;
         var _rgxmap = extensions ? extend(regexes, extensions) : regexes;
         var _isSelfNav = _navigator && _navigator.userAgent == _ua;
+        var _clientHints;
+
+
+        // opt-in for high-entropy (eg. model name) client-hints
+        this.useBrowserClientHints = function () {
+            return new Promise(function (resolve, reject) {
+                if (typeof _navigator.userAgentData !== 'undefined') {
+                    _navigator.userAgentData.getHighEntropyValues([
+                        'model',
+                        'mobile',
+                        'platform',
+                        'platformVersion'
+                    ]).then(function (ch) {
+                        console.log('Client hints: ', ch);
+
+                        _clientHints = {
+                            'Sec-CH-UA-Mobile': ch.mobile,
+                            'Sec-CH-UA-Model': ch.model,
+                            'Sec-CH-UA-Platform': ch.platform,
+                            'Sec-CH-UA-Platform-Version': ch.platformVersion
+                        };
+                        resolve();
+                    });
+                } else {
+                    _clientHints = null;
+                    resolve();
+                }
+            });
+        };
+
+        // parse client-hints from headers (used in backend & tests)
+        this.useHeaderClientHints = function (ch) {
+            _clientHints = {
+                'Sec-CH-UA-Mobile': ch['Sec-CH-UA-Mobile'],
+                'Sec-CH-UA-Model': ch['Sec-CH-UA-Model'],
+                'Sec-CH-UA-Platform': ch['Sec-CH-UA-Platform'],
+                'Sec-CH-UA-Platform-Version': ch['Sec-CH-UA-Platform-Version']
+            };
+        };
+
+        this.clearClientHints = function() {
+            _clientHints = undefined;
+        };
 
         this.getBrowser = function () {
             var _browser = {};
@@ -858,6 +901,13 @@
                 _device[MODEL] = 'iPad';
                 _device[TYPE] = TABLET;
             }
+
+            // high-entropy client-hints support
+            if (_clientHints) {
+                _device[MODEL] = _clientHints['Sec-CH-UA-Model'] || _device[MODEL];
+                _device[TYPE] = _clientHints['Sec-CH-UA-Mobile'] == "1" ? MOBILE : _device[TYPE];
+            }
+
             return _device;
         };
         this.getEngine = function () {
@@ -873,10 +923,16 @@
             _os[VERSION] = undefined;
             rgxMapper.call(_os, _ua, _rgxmap.os);
             if (_isSelfNav && !_os[NAME] && _uach && _uach.platform && _uach.platform != 'Unknown') {
-                _os[NAME] = _uach.platform  
+                _os[NAME] = _uach.platform
                                     .replace(/chrome os/i, CHROMIUM_OS)
                                     .replace(/macos/i, MAC_OS);           // backward compatibility
             }
+
+            // high-entropy client-hints support
+            if (_clientHints) {
+                _os[VERSION] = _clientHints['Sec-CH-UA-Platform-Version'] || _os[VERSION];
+            }
+
             return _os;
         };
         this.getResult = function () {
