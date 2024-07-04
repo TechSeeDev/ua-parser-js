@@ -195,7 +195,7 @@ declare namespace UAParser {
          *  saves them in instance if save flag is set to true
          *  if not, call useClientHints to save them manually
          */
-        fetchClientHints(save: boolean): ClientHintHeaders | null;
+        fetchClientHints(save: boolean): Promise<ClientHintHeaders | null>;
 
         /**
          *  fetch client hints from headers (used in backend & tests)
