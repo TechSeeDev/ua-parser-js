@@ -851,14 +851,14 @@
                             this.useClientHints(clientHintsHeaders);
                         }
                         resolve(clientHintsHeaders);
-                    });
+                    }.bind(this));
                 } else {
                     if (save) {
                         this.useClientHints(null);
                     }
                     resolve(null);
                 }
-            });
+            }.bind(this));
         };
 
         // save parsed client-hints in header format
