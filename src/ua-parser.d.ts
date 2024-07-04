@@ -188,7 +188,7 @@ declare namespace UAParser {
          *  saves them in instance if save flag is set to true
          *  if not, call useClientHints to save them manually
          */
-        fetchClientHints(save: boolean = true): Record<string, unknown>;
+        fetchClientHints(save: boolean): Record<string, unknown>;
 
         /**
          *  fetch client hints from headers (used in backend & tests)
