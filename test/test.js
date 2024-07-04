@@ -64,7 +64,7 @@ for (var i in methods) {
                     describe('"' + methods[i]['list'][j].ua + '"', function () {
                         var ch = methods[i]['list'][j].ch;
                         if (ch) {
-                            parser.useHeaderClientHints(ch);
+                            parser.useClientHints(ch);
                         }
                         var expect = methods[i]['list'][j].expect;
                         var result = parser.setUA(methods[i]['list'][j].ua).getResult()[methods[i]['label']];

@@ -185,13 +185,15 @@ declare namespace UAParser {
 
         /**
          *  fetch client hints from browser (by calling navigator.userAgentData.getHighEntropyValues)
+         *  saves them in instance if save flag is set to true
+         *  if not, call useClientHints to save them manually
          */
-        useBrowserClientHints(): void;
+        fetchClientHints(save: boolean = true): Record<string, unknown>;
 
         /**
          *  fetch client hints from headers (used in backend & tests)
          */
-        useHeaderClientHints(ch: Array): void
+        useClientHints(ch: Record<string, unknown>): void
 
         /**
          *  clear already stored client hints information

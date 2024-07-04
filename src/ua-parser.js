@@ -827,44 +827,56 @@
         var _isSelfNav = _navigator && _navigator.userAgent == _ua;
         var _clientHints;
 
+        // fetches client-hints using web API
+        // if save flag is set to true, client-hints will be saved in the instance
+        this.fetchClientHints = function (save) {
+            if(!save) {
+                save = true;
+            }
 
-        // opt-in for high-entropy (eg. model name) client-hints
-        this.useBrowserClientHints = function () {
-            return new Promise(function (resolve, reject) {
+            return new Promise(function (resolve) {
                 if (typeof _navigator.userAgentData !== 'undefined') {
                     _navigator.userAgentData.getHighEntropyValues([
                         'model',
-                        'mobile',
-                        'platform',
                         'platformVersion'
                     ]).then(function (ch) {
-                        console.log('Client hints: ', ch);
-
-                        _clientHints = {
+                        var clientHintsHeaders = {
                             'Sec-CH-UA-Mobile': ch.mobile,
                             'Sec-CH-UA-Model': ch.model,
                             'Sec-CH-UA-Platform': ch.platform,
                             'Sec-CH-UA-Platform-Version': ch.platformVersion
                         };
-                        resolve();
+
+                        if (save) {
+                            this.useClientHints(clientHintsHeaders);
+                        }
+                        resolve(clientHintsHeaders);
                     });
                 } else {
-                    _clientHints = null;
-                    resolve();
+                    if (save) {
+                        this.useClientHints(null);
+                    }
+                    resolve(null);
                 }
             });
         };
 
-        // parse client-hints from headers (used in backend & tests)
-        this.useHeaderClientHints = function (ch) {
+        // save parsed client-hints in header format
+        this.useClientHints = function (ch) {
+            if (!ch) {
+                _clientHints = null;
+                return;
+            }
+
             _clientHints = {
-                'Sec-CH-UA-Mobile': ch['Sec-CH-UA-Mobile'],
-                'Sec-CH-UA-Model': ch['Sec-CH-UA-Model'],
-                'Sec-CH-UA-Platform': ch['Sec-CH-UA-Platform'],
-                'Sec-CH-UA-Platform-Version': ch['Sec-CH-UA-Platform-Version']
+                'Sec-CH-UA-Mobile': ch['Sec-CH-UA-Mobile'] || null,
+                'Sec-CH-UA-Model': ch['Sec-CH-UA-Model'] || null,
+                'Sec-CH-UA-Platform': ch['Sec-CH-UA-Platform'] || null,
+                'Sec-CH-UA-Platform-Version': ch['Sec-CH-UA-Platform-Version'] || null
             };
         };
 
+        // clear saved client-hints
         this.clearClientHints = function() {
             _clientHints = undefined;
         };
@@ -930,6 +942,7 @@
 
             // high-entropy client-hints support
             if (_clientHints) {
+                _os[NAME] = _clientHints['Sec-CH-UA-Platform'] || _os[VERSION];
                 _os[VERSION] = _clientHints['Sec-CH-UA-Platform-Version'] || _os[VERSION];
             }
 
