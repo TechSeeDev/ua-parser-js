@@ -142,6 +142,13 @@ declare namespace UAParser {
         VERSION: "version";
     }
 
+    interface ClientHintHeaders {
+        'Sec-CH-UA-Mobile': boolean | null,
+        'Sec-CH-UA-Model': string | null,
+        'Sec-CH-UA-Platform': string | null,
+        'Sec-CH-UA-Platform-Version': string | null
+    }
+
     interface UAParserInstance {
         /**
          *  Returns browser information
@@ -188,12 +195,12 @@ declare namespace UAParser {
          *  saves them in instance if save flag is set to true
          *  if not, call useClientHints to save them manually
          */
-        fetchClientHints(save: boolean): Record<string, unknown>;
+        fetchClientHints(save: boolean): ClientHintHeaders | null;
 
         /**
          *  fetch client hints from headers (used in backend & tests)
          */
-        useClientHints(ch: Record<string, unknown>): void
+        useClientHints(ch: ClientHintHeaders | null): void
 
         /**
          *  clear already stored client hints information

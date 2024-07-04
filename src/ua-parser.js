@@ -841,10 +841,10 @@
                         'platformVersion'
                     ]).then(function (ch) {
                         var clientHintsHeaders = {
-                            'Sec-CH-UA-Mobile': ch.mobile,
-                            'Sec-CH-UA-Model': ch.model,
-                            'Sec-CH-UA-Platform': ch.platform,
-                            'Sec-CH-UA-Platform-Version': ch.platformVersion
+                            'Sec-CH-UA-Mobile': ch.mobile || null,
+                            'Sec-CH-UA-Model': ch.model || null,
+                            'Sec-CH-UA-Platform': ch.platform || null,
+                            'Sec-CH-UA-Platform-Version': ch.platformVersion || null
                         };
 
                         if (save) {
